@@ -22,7 +22,7 @@ Email is posing as XYZ Bank with very well styled logo, background colors, and b
 
 **VirusTotal Reputation** – Searching for the full URL and the root domain on VT shows that it is currently not being flagged as malicious, indicating the domain is new and thus, has not been analysed by security engines.
 
-**URL2PNG Analysis –** Using URL2PNG to view the URL link showed that the site was hosting a fake XYZ bank login portal, used to steal any credentials that are entered. Looking at the root domain “hxxps://www.igotyoue.com” shows that the site has attempted to counterfeit the xyz bank homepage visually, a high indicator that the domain is used for malicious operations.
+**URL2PNG Analysis –** Using URL2PNG to view the URL link showed that the site was hosting a fake XYZ bank login portal, used to steal any credentials that are entered. Looking at the root domain “hxxps://www[.]igotyoue[.]com” shows that the site has attempted to counterfeit the xyz bank homepage visually, a high indicator that the domain is used for malicious operations.
 
 # Suggested Defensive Measures
 
