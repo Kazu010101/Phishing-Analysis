@@ -49,7 +49,7 @@ Screenshot 02
 
 ## Artifact Collection Reference Table
 
-An interactive reference table mapping every collectible artifact (email headers, URLs, file hashes, etc.) against 11 phishing attack types including BEC, credential harvesters, Office macros, smishing, and vishing.
+A summative reference table mapping every collectible artifact (email headers, URLs, file hashes, etc.) against 11 phishing attack types including BEC, credential harvesters, Office macros, smishing, and vishing.
 <img width="1756" height="802" alt="image" src="https://github.com/user-attachments/assets/607f7317-e7a7-4e23-b4fc-5444dcf15c3f" />
 <img width="1763" height="252" alt="image" src="https://github.com/user-attachments/assets/1472227b-4f17-460a-be6b-0d8f650ff923" />
 
