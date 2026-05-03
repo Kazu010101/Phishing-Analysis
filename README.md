@@ -24,7 +24,7 @@ I'm currently working toward upskilling myself to land a job as **SOC Analyst Ti
 │   ├── phishing_artifact_table.html    ← Artifact collection cheat sheet table
 │
 └── 📁 sample-reports/
-    ├── report_001_credential_harvester.md   ← [Link here]
+    ├── report_001_credential_harvester.md   ← [Click hyperlink in the table to view the sample report]
     ├── report_002_malicious_attachment.md   ← [In Progress]
     
 ```
