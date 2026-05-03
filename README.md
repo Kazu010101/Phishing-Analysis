@@ -39,8 +39,8 @@ A visual, step-by-step flowchart covering the full phishing investigation lifecy
 
 🔗 **[View Flowchart](https://kazu010101.github.io/Phishing-Analysis/phishing_flowchart.html)** *(best viewed via GitHub Pages)*
 
-<!-- Optional: Add a screenshot of the flowchart here once hosted -->
-<!-- ![Flowchart Preview](./assets/flowchart_preview.png) -->
+<img width="883" height="847" alt="image" src="https://github.com/user-attachments/assets/4a7f7df3-d5e1-432d-a91b-94c44a58e67e" />
+
 
 ---
 
