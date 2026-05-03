@@ -86,7 +86,7 @@ Personal learning notes covering the full phishing analysis process, including t
 
 ## 🔍 Sample Investigation Reports
 
-Real-world style phishing investigations documented in analyst report format. Each report follows the full investigation workflow: artifact collection → analysis findings → defensive actions taken → IOC summary.
+Real-world style phishing investigations documented in analyst report format. Each report follows the full investigation workflow: Email Description → artifact collection → analysis findings → defensive actions taken.
 
 <!-- Add a row for each report you include -->
 
