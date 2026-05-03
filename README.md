@@ -80,7 +80,7 @@ Personal learning notes covering the full phishing analysis process, including t
 | Defensive Measures | Gateway blocks, proxy rules, endpoint hash blocks |
 | Report Writing | IOC defanging, documentation standards, block action logging |
 
-🔗 **[View Notes](./reference/notes/phishing_analysis_notes.md)**
+🔗 **[View Notes](https://github.com/Kazu010101/Phishing-Analysis/blob/main/phishing_analysis_notes.md)**
 
 ---
 
