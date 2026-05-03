@@ -22,8 +22,6 @@ I'm currently working toward upskilling myself to land a job as **SOC Analyst Ti
 ├── 📁 reference/
 │   ├── phishing_flowchart.html         ← SOC Tier 1 Phishing investigation flowchart
 │   ├── phishing_artifact_table.html    ← Artifact collection cheat sheet table
-│   └── notes/
-│       └── phishing_analysis_notes.md  ← Full investigation notes
 │
 └── 📁 sample-reports/
     ├── report_001_credential_harvester.md   ← [Add your report]
