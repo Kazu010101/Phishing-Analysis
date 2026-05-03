@@ -65,9 +65,9 @@ A summative reference table mapping every collectible artifact (email headers, U
 
 ---
 
-## Investigation Notes
+## My Learning Notes
 
-Personal reference notes covering the full phishing analysis process, including theory, tooling, and methodology.
+Personal learning notes covering the full phishing analysis process, including theory, tooling, and methodology.
 
 | Section | Topics |
 |---|---|
