@@ -26,7 +26,7 @@ Email is posing as XYZ Bank with very well styled logo, background colors, and b
 
 # Suggested Defensive Measures
 
-Although the sender address managed to spoof `customer_support@xyz[.]com[.]au`, Reverse DNS analysis reveals that the IP `209.85.167.42` originates from Gmail, not XYZ Bank. Thus, it is not recommended to block the sending server IP because it originates from Gmail, as doing so could block legitimate emails, which could negatively affect the business. We also cannot block `customer_support@xyz[.]com[.]au` because it is a legitimate email that our business have interest with. 
+Although the sender address managed to spoof `customer_support@xyz[.]com[.]au`, Reverse DNS analysis reveals that the IP `209.85.167.42` originates from Gmail, not XYZ Bank. Thus, it is not recommended to block the sending server IP because it originates from Gmail, as doing so could block legitimate emails, which could negatively affect the business. We also cannot block `customer_support@xyz[.]com[.]au` because it is a legitimate bank email that our business have interest with. 
 
 - Defensive Measure #1 Proposed: `Block Subject Line on the Email Gateway` 
 
