@@ -8,12 +8,12 @@ Email is posing as XYZ Bank with very well styled logo, background colors, and b
 
 - **Sender:** customer_support@xyz[.]com[.]au
 - **Subject Line**: "You won't be able to login - RESPOND NOW!"
-- **Recipient(s)**: Jane.Smith@abc.co.au 
+- **Recipient(s)**: Jane[.]Smith@abc[.]co[.]au 
 - **Sending Server IP**: 209.85.167.42
 - **Reverse DNS**: mail-lf1-f42.google.com
-- **Reply-To**: mysecretemail@gmail.com (*if available*)
+- **Reply-To**: mysecretemail@gmail[.]com (*if available*)
 - **Date and Time**: Fri, 1st May 2026 03:54:11 pm
-- **Hyperlinked URL**: hxxps://www.igotyoue.com/creds/2026/j41da1/xyzbank.php?
+- **Hyperlinked URL**: hxxps://www[.]igotyoue[.]com/creds/2026/j41da1/xyzbank.php?
 
 # Artefact Analysis
 
