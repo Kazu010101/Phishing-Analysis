@@ -39,7 +39,7 @@ A visual, step-by-step flowchart covering the full phishing investigation lifecy
 
 **Covers:** Alert triage → Email retrieval → Artifact collection → Analysis → Decision point → Notify recipients → Defensive measures → Report writing
 
-🔗 **[View Flowchart](./reference/phishing_flowchart.html)** *(best viewed via GitHub Pages)*
+🔗 **[View Flowchart](https://kazu010101.github.io/Phishing-Analysis/phishing_flowchart.html)** *(best viewed via GitHub Pages)*
 
 <!-- Optional: Add a screenshot of the flowchart here once hosted -->
 <!-- ![Flowchart Preview](./assets/flowchart_preview.png) -->
