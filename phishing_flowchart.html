@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOC Tier 1 — Phishing Investigation Flowchart</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #090d13;
+    --panel: #0e1520;
+    --border: #1c2d45;
+    --accent: #00e5ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --warn: #ffd166;
+    --danger: #ff4d6d;
+    --text: #cdd9e5;
+    --muted: #4a6080;
+    --phase1: #0a2a4a;
+    --phase2: #0a3a2a;
+    --phase3: #1a2a0a;
+    --phase4: #2a1a0a;
+    --phase5: #1a0a2a;
+    --connector: #1c2d45;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Barlow', sans-serif;
+    font-weight: 400;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    text-align: center;
+    margin-bottom: 48px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .site-header::after {
+    content: '';
+    display: block;
+    width: 120px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    margin: 20px auto 0;
+  }
+  .label-tag {
+    display: inline-block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 4px 12px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 900;
+    font-size: clamp(32px, 5vw, 56px);
+    letter-spacing: 1px;
+    line-height: 1;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  h1 span { color: var(--accent); }
+  .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  /* ── Legend ── */
+  .legend {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 48px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ── Flow Container ── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  /* ── Connector Arrow ── */
+  .arrow {
+    width: 2px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--accent), rgba(0,229,255,0.3));
+    position: relative;
+    margin: 0 auto;
+  }
+  .arrow::after {
+    content: '▼';
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--accent);
+    font-size: 12px;
+  }
+  .arrow-short { height: 24px; }
+
+  /* ── Phase Label ── */
+  .phase-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  /* ── Node Base ── */
+  .node {
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 18px 24px;
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+  .node:hover { border-color: var(--accent); }
+
+  .node-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .node-icon {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  .node-body {
+    font-size: 13px;
+    color: #8da0b5;
+    line-height: 1.5;
+  }
+  .node-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    position: absolute;
+    top: 10px; right: 14px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* Node color variants */
+  .node-trigger  { background: #0a0f1a; border-color: var(--accent2); }
+  .node-trigger .node-title { color: var(--accent2); }
+  .node-trigger .node-icon  { background: rgba(255,107,53,0.15); color: var(--accent2); }
+
+  .node-obtain   { background: #0c1525; border-color: #2c4f7c; }
+  .node-obtain .node-title  { color: #5bb5ff; }
+  .node-obtain .node-icon   { background: rgba(91,181,255,0.12); color: #5bb5ff; }
+
+  .node-identify { background: #0b1822; border-color: #1a3850; }
+  .node-identify .node-title { color: var(--accent); }
+  .node-identify .node-icon  { background: rgba(0,229,255,0.1); color: var(--accent); }
+
+  .node-collect  { background: #101820; border-color: #1e3a20; }
+  .node-collect .node-title  { color: #4dde70; }
+  .node-collect .node-icon   { background: rgba(77,222,112,0.1); color: #4dde70; }
+
+  .node-analyze  { background: #120f1e; border-color: #2d1a4a; }
+  .node-analyze .node-title  { color: #c385ff; }
+  .node-analyze .node-icon   { background: rgba(195,133,255,0.1); color: #c385ff; }
+
+  .node-decision { background: #1a1a08; border-color: #4a4a10; border-radius: 0; 
+                   clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+                   width: 220px; height: 110px; max-width: 220px;
+                   display: flex; align-items: center; justify-content: center;
+                   padding: 0;
+                   border: none; }
+  .node-decision-wrap {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 0;
+  }
+  .decision-box {
+    width: 220px; height: 110px;
+    position: relative;
+    margin: 0 auto;
+  }
+  .decision-diamond {
+    width: 220px; height: 110px;
+    background: #1a1a08;
+    border: 2px solid var(--warn);
+    transform: rotate(45deg) scale(0.65);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .decision-text {
+    position: absolute;
+    inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .decision-text .dt-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--warn);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+  .decision-text .dt-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-align: center;
+  }
+
+  .node-notify   { background: #180d20; border-color: #3a1a50; }
+  .node-notify .node-title  { color: #e0a0ff; }
+  .node-notify .node-icon   { background: rgba(224,160,255,0.1); color: #e0a0ff; }
+
+  .node-defend   { background: #0e1a10; border-color: #1a3822; }
+  .node-defend .node-title  { color: var(--accent3); }
+  .node-defend .node-icon   { background: rgba(57,255,20,0.08); color: var(--accent3); }
+
+  .node-report   { background: #1a100a; border-color: #402010; }
+  .node-report .node-title  { color: #ff9a5c; }
+  .node-report .node-icon   { background: rgba(255,154,92,0.1); color: #ff9a5c; }
+
+  .node-close    { background: #050a0e; border-color: var(--accent); }
+  .node-close .node-title   { color: var(--accent); }
+  .node-close .node-icon    { background: rgba(0,229,255,0.1); color: var(--accent); }
+
+  /* Tags */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tag {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    border: 1px solid;
+    cursor: default;
+  }
+  .tag-tool  { color: #5bb5ff; border-color: #1a3d60; background: #0a1f35; }
+  .tag-ioc   { color: #ff9a5c; border-color: #4a2010; background: #1a0e06; }
+  .tag-action{ color: #4dde70; border-color: #1a3820; background: #0a1a0a; }
+  .tag-warn  { color: var(--warn); border-color: #4a4010; background: #1a1506; }
+
+  /* Checklist */
+  .checklist {
+    list-style: none;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .checklist li {
+    font-size: 12.5px;
+    color: #7a92a8;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    line-height: 1.4;
+  }
+  .checklist li::before {
+    content: '›';
+    color: var(--accent);
+    font-size: 14px;
+    line-height: 1.2;
+    flex-shrink: 0;
+  }
+
+  /* Columns */
+  .cols {
+    display: grid;
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .cols-2 { grid-template-columns: 1fr 1fr; }
+
+  .sub-card {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px 12px;
+  }
+  .sub-card-title {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+  .sub-card ul {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .sub-card ul li {
+    font-size: 11.5px;
+    color: #6a8298;
+    padding-left: 10px;
+    position: relative;
+    line-height: 1.4;
+  }
+  .sub-card ul li::before {
+    content: '·';
+    position: absolute;
+    left: 0;
+    color: var(--muted);
+  }
+
+  /* Branching */
+  .branch-container {
+    display: flex;
+    width: 100%;
+    max-width: 680px;
+    gap: 16px;
+    align-items: flex-start;
+    justify-content: center;
+  }
+  .branch {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+  .branch-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 8px;
+  }
+  .branch-no   { background: rgba(255,77,109,0.1); color: var(--danger); border: 1px solid rgba(255,77,109,0.3); }
+  .branch-yes  { background: rgba(255,209,102,0.1); color: var(--warn);  border: 1px solid rgba(255,209,102,0.3); }
+  .branch-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+    margin-bottom: 0;
+  }
+
+  /* horizontal branch line from decision */
+  .decision-branch-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100%;
+    max-width: 680px;
+    position: relative;
+  }
+
+  .h-line {
+    height: 2px;
+    background: var(--border);
+    flex: 1;
+    margin-top: 0;
+  }
+
+  /* Alert box */
+  .alert {
+    border-left: 3px solid var(--warn);
+    background: rgba(255,209,102,0.05);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #b89a50;
+    margin-top: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.5px;
+  }
+
+  /* Not malicious path */
+  .not-malicious-node {
+    background: #0a120a;
+    border: 1px solid #1a3a1a;
+    border-radius: 4px;
+    padding: 14px 18px;
+    width: 200px;
+    text-align: center;
+  }
+  .not-malicious-node .nm-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent3);
+    margin-bottom: 4px;
+  }
+  .not-malicious-node .nm-body {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .escalate-node {
+    background: #120a0a;
+    border: 1px solid #3a1010;
+    border-radius: 4px;
+    padding: 14px 18px;
+    width: 200px;
+    text-align: center;
+  }
+  .escalate-node .e-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--danger);
+    margin-bottom: 4px;
+  }
+  .escalate-node .e-body {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* Step numbers */
+  .step-bubble {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+
+  /* Wide node */
+  .node-wide { max-width: 680px; }
+
+  /* Footer */
+  .footer {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  /* Scanline effect */
+  @keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100vh); }
+  }
+  .scanline {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to bottom, transparent, rgba(0,229,255,0.04), transparent);
+    pointer-events: none;
+    z-index: 999;
+    animation: scanline 8s linear infinite;
+  }
+
+  @media (max-width: 640px) {
+    .cols-3 { grid-template-columns: 1fr; }
+    .cols-2 { grid-template-columns: 1fr; }
+    .branch-container { flex-direction: column; align-items: center; }
+    .branch { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="page">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="label-tag">BTL1 Reference · SOC Tier 1</div>
+    <h1>Phishing <span>Investigation</span> Flowchart</h1>
+    <div class="subtitle">DETECT → COLLECT → ANALYZE → DEFEND → REPORT</div>
+  </header>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#ff6b35"></div>Trigger</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#5bb5ff"></div>Obtain</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#00e5ff"></div>Identify</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4dde70"></div>Collect Artifacts</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#c385ff"></div>Analyze</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ffd166"></div>Decision</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e0a0ff"></div>Notify</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#39ff14"></div>Defend</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff9a5c"></div>Report</div>
+  </div>
+
+  <!-- FLOW -->
+  <div class="flow">
+
+    <!-- ═══ STEP 0: TRIGGER ═══ -->
+    <div class="phase-label">PHASE 0 · TRIGGER</div>
+    <div class="node node-trigger">
+      <span class="node-num">STEP 00</span>
+      <div class="node-title">
+        <div class="node-icon">⚡</div>
+        Alert / Phishing Email Reported
+      </div>
+      <div class="node-body">Investigation is triggered by one of the following sources:</div>
+      <div class="cols cols-3" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">User Report</div>
+          <ul><li>Employee forwards suspicious email to security mailbox</li></ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Gateway Alert</div>
+          <ul><li>Email security tool flags and quarantines message</li></ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">SIEM / Threat Intel</div>
+          <ul><li>IOC match or anomaly detection triggers alert</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ STEP 1: OBTAIN ═══ -->
+    <div class="phase-label">PHASE 1 · OBTAIN</div>
+    <div class="node node-obtain">
+      <span class="node-num">STEP 01</span>
+      <div class="node-title">
+        <div class="node-icon">📥</div>
+        Retrieve Original Email Copy
+      </div>
+      <div class="node-body">Always obtain the raw email file — never rely on previews or forwarded copies which strip headers.</div>
+      <div class="cols cols-3" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">Email Gateway</div>
+          <ul><li>Pull directly from gateway quarantine or logs</li></ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Mail Server</div>
+          <ul><li>Extract from Microsoft Exchange or similar</li></ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">User-Forwarded</div>
+          <ul><li>User forwards as attachment (preserves headers)</li></ul>
+        </div>
+      </div>
+      <div class="alert">⚠ OPEN EMAIL ONLY IN A VM OR DEDICATED "DIRTY" ANALYSIS SYSTEM</div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ STEP 2: IDENTIFY ═══ -->
+    <div class="phase-label">PHASE 2 · INITIAL IDENTIFICATION</div>
+    <div class="node node-identify">
+      <span class="node-num">STEP 02</span>
+      <div class="node-title">
+        <div class="node-icon">🔍</div>
+        Identify Phishing Indicators
+      </div>
+      <div class="node-body">Perform a rapid first pass to confirm the email is suspicious and understand the attack type.</div>
+      <div class="cols cols-2" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">Common Red Flags</div>
+          <ul>
+            <li>Unknown / spoofed sending address</li>
+            <li>Urgency language or emotional pressure</li>
+            <li>Grammar errors / poor formatting</li>
+            <li>Mismatched display name vs actual address</li>
+            <li>Unexpected attachment or link</li>
+            <li>Sender domain ≠ claimed brand domain</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Attack Type Classification</div>
+          <ul>
+            <li><strong style="color:#5bb5ff">Credential Harvester</strong> — fake login page</li>
+            <li><strong style="color:#ff9a5c">Malware Delivery</strong> — malicious attachment</li>
+            <li><strong style="color:#c385ff">BEC</strong> — impersonates executive/vendor</li>
+            <li><strong style="color:#4dde70">Social Engineering</strong> — info extraction</li>
+            <li><strong style="color:#ffd166">Spear Phishing</strong> — targeted individual</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-tool">Open in Text Editor</span>
+        <span class="tag tag-tool">Email Client (Thunderbird)</span>
+        <span class="tag tag-warn">VM Only!</span>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ STEP 3: COLLECT ═══ -->
+    <div class="phase-label">PHASE 3 · ARTIFACT COLLECTION</div>
+    <div class="node node-collect">
+      <span class="node-num">STEP 03</span>
+      <div class="node-title">
+        <div class="node-icon">🗂</div>
+        Collect All Artifacts (IOCs)
+      </div>
+      <div class="node-body">Extract all email, web, and file artifacts before proceeding to analysis. Use a text editor on the raw .eml file.</div>
+      <div class="cols cols-3" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">📧 Email Artifacts</div>
+          <ul>
+            <li>Sending Address (From)</li>
+            <li>Sending Domain</li>
+            <li>Reply-To (if different)</li>
+            <li>Date &amp; Time</li>
+            <li>Subject Line</li>
+            <li>Sending Server IP (X-Sender-IP)</li>
+            <li>Reverse DNS of sending IP</li>
+            <li>SPF / DKIM / DMARC result</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">🌐 Web Artifacts</div>
+          <ul>
+            <li>All URLs in email body</li>
+            <li>Hyperlinks in HTML anchor tags</li>
+            <li>Shortened URLs (expand safely)</li>
+            <li>Redirect chain destination</li>
+            <li>URLs inside attachments</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">📁 File Artifacts</div>
+          <ul>
+            <li>Attachment filename + extension</li>
+            <li>File size</li>
+            <li>MD5 hash</li>
+            <li>SHA256 hash</li>
+            <li>Base64-encoded body content</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-tool">Text Editor (.eml)</span>
+        <span class="tag tag-tool">CyberChef (Base64 decode)</span>
+        <span class="tag tag-tool">PowerShell Get-FileHash</span>
+        <span class="tag tag-tool">sha256sum (Linux)</span>
+        <span class="tag tag-ioc">Document ALL values</span>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ STEP 4: ANALYZE ═══ -->
+    <div class="phase-label">PHASE 4 · ARTIFACT ANALYSIS</div>
+    <div class="node node-analyze">
+      <span class="node-num">STEP 04</span>
+      <div class="node-title">
+        <div class="node-icon">🔬</div>
+        Analyze All Artifacts
+      </div>
+      <div class="node-body">Use tools to determine maliciousness. Treat artifacts as guilty until proven innocent.</div>
+      <div class="cols cols-3" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">📧 Email Header Analysis</div>
+          <ul>
+            <li>Verify SPF / DKIM / DMARC pass</li>
+            <li>Check Reply-To ≠ From (spoofing?)</li>
+            <li>Trace Received headers (hop path)</li>
+            <li>Cross-check sending IP vs claimed domain</li>
+            <li>Look for X-Originating-IP anomalies</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">🌐 URL Analysis</div>
+          <ul>
+            <li>Expand shortened URLs (WannaBrowser)</li>
+            <li>Screenshot site (URL2PNG / URLScan)</li>
+            <li>Reputation check (VirusTotal / URLScan)</li>
+            <li>Domain WHOIS (whois.domaintools.com)</li>
+            <li>IP reputation (IPVoid)</li>
+            <li>Check PhishTank / URLhaus feeds</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">📁 File Analysis</div>
+          <ul>
+            <li>Hash lookup: VirusTotal / Talos</li>
+            <li>Upload file to VirusTotal sandbox</li>
+            <li>Manual analysis in VM (run safely)</li>
+            <li>Check macro presence (Office docs)</li>
+            <li>Enterprise sandbox (Cuckoo, etc.)</li>
+            <li>Watch for double extensions (.pdf.exe)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-tool">VirusTotal</span>
+        <span class="tag tag-tool">URLScan.io</span>
+        <span class="tag tag-tool">URL2PNG</span>
+        <span class="tag tag-tool">WannaBrowser</span>
+        <span class="tag tag-tool">IPVoid</span>
+        <span class="tag tag-tool">Talos File Reputation</span>
+        <span class="tag tag-tool">PhishTank</span>
+        <span class="tag tag-tool">MXToolbox</span>
+        <span class="tag tag-warn">Not flagged ≠ safe!</span>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ DECISION ═══ -->
+    <div class="phase-label">DECISION POINT</div>
+
+    <!-- Decision diamond via CSS trick -->
+    <div style="width:100%;max-width:680px;display:flex;flex-direction:column;align-items:center;">
+      <div style="position:relative;width:220px;height:110px;margin:0 auto;">
+        <div style="position:absolute;inset:0;background:#1a1800;border:2px solid var(--warn);transform:rotate(45deg) scaleY(0.55);border-radius:4px;"></div>
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--warn);letter-spacing:1px;">MALICIOUS?</div>
+          <div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px;margin-top:2px;">ASSESS EVIDENCE</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Branches -->
+    <div style="width:100%;max-width:680px;display:flex;align-items:flex-start;justify-content:space-around;margin-top:10px;gap:10px;">
+      <!-- NO branch -->
+      <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+        <div class="branch-label branch-no">✗ NOT MALICIOUS</div>
+        <div class="branch-line"></div>
+        <div class="not-malicious-node">
+          <div class="nm-title">Close Ticket</div>
+          <div class="nm-body">Document findings. Mark as false positive. Inform reporter. No defensive action required.</div>
+        </div>
+      </div>
+      <!-- YES branch -->
+      <div style="display:flex;flex-direction:column;align-items:center;flex:1;">
+        <div class="branch-label branch-yes">✓ CONFIRMED MALICIOUS</div>
+        <div class="branch-line"></div>
+        <div class="escalate-node">
+          <div class="e-title">Continue ↓</div>
+          <div class="e-body">Proceed through remaining response steps immediately.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ STEP 5: NOTIFY ═══ -->
+    <div class="phase-label">PHASE 5 · NOTIFY RECIPIENTS</div>
+    <div class="node node-notify">
+      <span class="node-num">STEP 05</span>
+      <div class="node-title">
+        <div class="node-icon">📢</div>
+        Inform All Email Recipients
+      </div>
+      <div class="node-body">Reduce the risk of interaction. Do not wait until defensive measures are complete.</div>
+      <div class="cols cols-2" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">How to Find Recipients</div>
+          <ul>
+            <li>Check email gateway delivery logs</li>
+            <li>Query mail server for all recipients of the message-ID</li>
+            <li>Check To / CC fields in original email</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Notification Must Include</div>
+          <ul>
+            <li>Date &amp; time the phishing email was sent</li>
+            <li>Subject line (to help them find it)</li>
+            <li>Clear instruction: DELETE or forward to security mailbox</li>
+            <li>Security team contact details</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-action">Send via BCC to all recipients</span>
+        <span class="tag tag-warn">Ask if anyone interacted with the email</span>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ STEP 6: DEFEND ═══ -->
+    <div class="phase-label">PHASE 6 · DEFENSIVE MEASURES</div>
+    <div class="node node-defend">
+      <span class="node-num">STEP 06</span>
+      <div class="node-title">
+        <div class="node-icon">🛡</div>
+        Take Defensive Measures
+      </div>
+      <div class="node-body">Block artifacts at appropriate control points. Always assess business impact before blocking. Document every action with timestamp and analyst name.</div>
+      <div class="cols cols-3" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">📧 Email Gateway</div>
+          <ul>
+            <li>Block Sender Address (if unique malicious)</li>
+            <li>Block Sender Domain (if fully malicious)</li>
+            <li>Block Sending Server IP (if not shared/legit)</li>
+            <li>Block Subject Line (if highly specific)</li>
+            <li>Recall delivered messages if possible</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">🌐 Web Proxy / Firewall</div>
+          <ul>
+            <li>Block malicious URL</li>
+            <li>Block malicious domain entirely</li>
+            <li>Block redirect destination</li>
+            <li>Block shortened URL if not expandable</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">🖥 Endpoint / AV / EDR</div>
+          <ul>
+            <li>Block file hash (MD5 / SHA256)</li>
+            <li>Quarantine or remove on infected hosts</li>
+            <li>Isolate infected machines if needed</li>
+            <li>Escalate to Tier 2 / IR if active compromise</li>
+          </ul>
+        </div>
+      </div>
+      <div class="alert">⚠ ALWAYS ASSESS NEGATIVE BUSINESS IMPACT BEFORE BLOCKING — document your justification for EVERY action taken.</div>
+      <div class="tags">
+        <span class="tag tag-ioc">Record: Block Type · Value · Date/Time · Analyst Name</span>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ STEP 7: REPORT ═══ -->
+    <div class="phase-label">PHASE 7 · INVESTIGATION REPORT</div>
+    <div class="node node-report">
+      <span class="node-num">STEP 07</span>
+      <div class="node-title">
+        <div class="node-icon">📝</div>
+        Write Investigation Report
+      </div>
+      <div class="node-body">Document every finding and action taken. This provides an audit trail and enables threat intelligence sharing.</div>
+      <div class="cols cols-2" style="margin-top:10px;">
+        <div class="sub-card">
+          <div class="sub-card-title">Report Must Include</div>
+          <ul>
+            <li>Executive summary of the attack</li>
+            <li>Complete IOC list (defanged)</li>
+            <li>Analysis findings for each artifact</li>
+            <li>Recipients notified and response</li>
+            <li>All defensive actions taken + justification</li>
+            <li>Timestamps for every action</li>
+            <li>Analyst name (accountability)</li>
+          </ul>
+        </div>
+        <div class="sub-card">
+          <div class="sub-card-title">Defang All IOCs Before Publishing</div>
+          <ul>
+            <li>8.8.8.8 → 8[.]8[.]8[.]8</li>
+            <li>https://evil.com → hxxps://evil[.]com</li>
+            <li>Use CyberChef: Defang IP / Defang URL operations</li>
+            <li>Never leave clickable malicious links in reports</li>
+          </ul>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag tag-tool">CyberChef (defang)</span>
+        <span class="tag tag-action">Defang ALL URLs and IPs</span>
+        <span class="tag tag-ioc">Log Block Type · Value · Date · Analyst</span>
+      </div>
+    </div>
+
+    <div class="arrow"></div>
+
+    <!-- ═══ CLOSE ═══ -->
+    <div class="node node-close" style="text-align:center;max-width:480px;">
+      <div class="node-title" style="justify-content:center;">
+        <div class="node-icon">✔</div>
+        Investigation Complete — Close Ticket
+      </div>
+      <div class="node-body" style="text-align:center;">Archive report. Share IOCs with threat intel if applicable. Recommend user awareness training if users were compromised.</div>
+    </div>
+
+  </div><!-- /flow -->
+
+  <!-- Footer -->
+  <div class="footer">
+    <span>BTL1 · Phishing Analysis Domain</span>
+    <span>SOC TIER 1 REFERENCE GUIDE</span>
+    <span>v1.0 · Security Blue Team</span>
+  </div>
+
+</div>
+</body>
+</html>
