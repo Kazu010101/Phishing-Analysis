@@ -56,7 +56,7 @@ An interactive reference table mapping every collectible artifact (email headers
 | Artifact rows | 29 across email, web, file, and alt-channel groups |
 | Cell data | Collection requirement (Required / Conditional / N/A) + recommended tool |
 
-🔗 **[View Artifact Table](./reference/phishing_artifact_table.html)** *(best viewed via GitHub Pages)*
+🔗 **[View Artifact Table](https://github.com/Kazu010101/Phishing-Analysis/blob/main/phishing_artifact_table.html)** *(best viewed via GitHub Pages)*
 
 ---
 
