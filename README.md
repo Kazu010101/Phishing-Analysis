@@ -70,7 +70,7 @@ A summative reference table mapping every collectible artifact (email headers, U
 
 Personal learning notes covering the full phishing analysis process, including theory, tooling, and methodology.
 
-| Section | Topics |
+| Key Sections | Topics |
 |---|---|
 | Email Identification | Red flags, attack type classification, social engineering indicators |
 | Artifact Collection | Email, web, and file artifact extraction methodology |
