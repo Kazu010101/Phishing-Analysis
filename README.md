@@ -90,10 +90,8 @@ Real-world style phishing investigations documented in analyst report format. Ea
 
 | # | Attack Type | Key Artifacts | Verdict | Report |
 |---|---|---|---|---|
-| 001 | Credential Harvester | Spoofed sender, fake login URL | ✅ Malicious | [View](./sample-reports/report_001_credential_harvester.md) |
+| 001 | Credential Harvester | Spoofed sender, fake login URL | ✅ Malicious | [View](https://github.com/Kazu010101/Phishing-Analysis/blob/main/SOC%20Analyst%20Report%20Sample-%20Phishing%20Email%20(fictitious).md) |
 | 002 | Malicious Attachment | SHA256 hash, VirusTotal hit | ✅ Malicious | [View](./sample-reports/report_002_malicious_attachment.md) |
-| 003 | BEC | Reply-To mismatch, wire transfer request | ✅ Malicious | [View](./sample-reports/report_003_bec.md) |
-| 004 | *(Add yours)* | — | — | — |
 
 > **Note on samples:** All email addresses, domains, IPs, and file hashes in these reports are either fabricated, defanged, or sourced from public threat intelligence feeds. No real victim data is included.
 
