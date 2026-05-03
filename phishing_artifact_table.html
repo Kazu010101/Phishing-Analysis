@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phishing Artifact Collection Reference Table — SOC Tier 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=IBM+Plex+Mono:wght@300;400;500&family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #07090e;
+  --surface: #0b0f18;
+  --raised:  #0f1520;
+  --border:  #1a2535;
+  --border2: #243347;
+
+  /* Column group accent colours */
+  --email-h:    #1a2d4a;
+  --email-c:    #5ba3ff;
+  --web-h:      #0f2a2a;
+  --web-c:      #00d9c8;
+  --file-h:     #162a10;
+  --file-c:     #5de85a;
+  --alt-h:      #2a1a0a;
+  --alt-c:      #ffaa55;
+
+  /* Row group tints */
+  --row-email:  rgba(91,163,255,0.04);
+  --row-web:    rgba(0,217,200,0.04);
+  --row-file:   rgba(93,232,90,0.04);
+  --row-alt:    rgba(255,170,85,0.04);
+
+  /* Symbols */
+  --req:    #00e5c8;
+  --cond:   #8899aa;
+  --na:     #2a3545;
+
+  --text:   #b8cce0;
+  --muted:  #4a6880;
+  --faint:  #2a3a4a;
+  --white:  #ddeeff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Barlow', sans-serif;
+  font-size: 14px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* subtle grid bg */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,200,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,200,255,0.025) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrapper {
+  position: relative; z-index: 1;
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+
+/* ── Page Header ── */
+.page-header {
+  margin-bottom: 36px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--border);
+}
+.tag-line {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 4px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.page-header h1 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 900;
+  font-size: clamp(26px, 4vw, 46px);
+  color: var(--white);
+  letter-spacing: 0.5px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.page-header h1 em {
+  font-style: normal;
+  color: var(--req);
+}
+.page-header p {
+  font-size: 13px;
+  color: var(--muted);
+  max-width: 720px;
+  line-height: 1.6;
+}
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 28px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.legend-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.legend-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+.legend-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text);
+}
+.sym {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+}
+.sym-req  { color: var(--req); }
+.sym-cond { color: var(--cond); }
+.sym-na   { color: var(--na); font-size: 12px; }
+
+.colgroup-dot {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Table Wrapper ── */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+}
+.table-scroll::-webkit-scrollbar { height: 8px; }
+.table-scroll::-webkit-scrollbar-track { background: var(--bg); }
+.table-scroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+/* ── Table ── */
+table {
+  border-collapse: collapse;
+  min-width: 1400px;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Column widths */
+col.c-rowgroup  { width: 110px; }
+col.c-artifact  { width: 175px; }
+col.c-spam      { width: 115px; }
+col.c-bec       { width: 115px; }
+col.c-spear     { width: 115px; }
+col.c-cred      { width: 115px; }
+col.c-urlshort  { width: 115px; }
+col.c-maldom    { width: 115px; }
+col.c-comprom   { width: 115px; }
+col.c-attach    { width: 115px; }
+col.c-macro     { width: 115px; }
+col.c-vishing   { width: 110px; }
+col.c-smishing  { width: 110px; }
+
+/* ── Sticky cols ── */
+td.sticky, th.sticky {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
+th.sticky-2nd, td.sticky-2nd {
+  position: sticky;
+  left: 110px;
+  z-index: 2;
+}
+
+/* ── Header rows ── */
+thead tr.super-header th {
+  padding: 12px 8px 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-align: center;
+  border-bottom: 2px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+thead tr.super-header th:last-child { border-right: none; }
+
+.sh-label {
+  padding: 2px 6px;
+  border-radius: 2px;
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+/* group bg colors for super-header */
+.sh-blank  { background: var(--raised);  color: transparent; border-bottom-color: var(--border2); }
+.sh-email  { background: var(--email-h); color: var(--email-c); border-bottom: 2px solid var(--email-c); }
+.sh-web    { background: var(--web-h);   color: var(--web-c);   border-bottom: 2px solid var(--web-c); }
+.sh-file   { background: var(--file-h);  color: var(--file-c);  border-bottom: 2px solid var(--file-c); }
+.sh-alt    { background: var(--alt-h);   color: var(--alt-c);   border-bottom: 2px solid var(--alt-c); }
+.sh-blank2 { background: var(--raised); }
+
+thead tr.col-header th {
+  padding: 10px 8px 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-align: center;
+  border-bottom: 1px solid var(--border2);
+  border-right: 1px solid var(--border);
+  vertical-align: bottom;
+  line-height: 1.35;
+  color: var(--text);
+}
+thead tr.col-header th:last-child { border-right: none; }
+
+.ch-email { background: rgba(91,163,255,0.07); color: #7ac0ff; }
+.ch-web   { background: rgba(0,217,200,0.07);  color: #4dd9cd; }
+.ch-file  { background: rgba(93,232,90,0.07);  color: #7de87a; }
+.ch-alt   { background: rgba(255,170,85,0.07); color: #ffba77; }
+.ch-row-artifact {
+  background: var(--raised);
+  text-align: left;
+  padding-left: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--muted);
+  z-index: 3;
+}
+.ch-row-group {
+  background: var(--raised);
+  z-index: 3;
+}
+
+/* ── Body rows ── */
+tbody tr {
+  border-bottom: 1px solid var(--border);
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover td { filter: brightness(1.15); }
+
+/* Row group dividers */
+tbody tr.row-group-start td,
+tbody tr.row-group-start th {
+  border-top: 2px solid var(--border2);
+}
+
+/* Row group header */
+td.row-group-cell {
+  background: var(--raised);
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 8px 6px;
+  vertical-align: middle;
+  border-right: 1px solid var(--border2);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.rgc-email { color: var(--email-c); border-right-color: var(--email-c); background: rgba(91,163,255,0.06); }
+.rgc-web   { color: var(--web-c);   border-right-color: var(--web-c);   background: rgba(0,217,200,0.06); }
+.rgc-file  { color: var(--file-c);  border-right-color: var(--file-c);  background: rgba(93,232,90,0.06); }
+.rgc-alt   { color: var(--alt-c);   border-right-color: var(--alt-c);   background: rgba(255,170,85,0.06); }
+
+/* Artifact label cell */
+td.artifact-label {
+  background: var(--raised);
+  padding: 8px 10px 8px 14px;
+  border-right: 1px solid var(--border2);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.art-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--white);
+  display: block;
+  line-height: 1.3;
+}
+.art-desc {
+  font-size: 10px;
+  color: var(--muted);
+  display: block;
+  margin-top: 2px;
+  white-space: normal;
+  line-height: 1.4;
+  max-width: 160px;
+}
+
+/* Row bg tints */
+tr.r-email { background: var(--row-email); }
+tr.r-web   { background: var(--row-web);   }
+tr.r-file  { background: var(--row-file);  }
+tr.r-alt   { background: var(--row-alt);   }
+
+/* Data cells */
+td.cell {
+  text-align: center;
+  vertical-align: middle;
+  padding: 6px 6px;
+  border-right: 1px solid var(--border);
+  line-height: 1.3;
+}
+td.cell:last-child { border-right: none; }
+
+/* Cell inner */
+.cell-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-height: 44px;
+  justify-content: center;
+}
+.cell-sym {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+}
+.cell-tool {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  line-height: 1.35;
+  max-width: 100px;
+  white-space: normal;
+  text-align: center;
+}
+
+/* Symbol colours */
+.s-req  .cell-sym  { color: var(--req); }
+.s-req  .cell-tool { color: #4a8a80; }
+.s-cond .cell-sym  { color: #5577aa; }
+.s-cond .cell-tool { color: #3a5060; }
+.s-na   .cell-sym  { color: var(--na); font-size: 13px; }
+.s-na   .cell-tool { display: none; }
+
+/* Note cells */
+.cell-note {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 8.5px;
+  color: #3a6060;
+  text-align: center;
+  padding: 0 4px;
+  line-height: 1.4;
+}
+.note-warn { color: #7a5a20; }
+.note-key  { color: #2a6a5a; }
+
+/* column group borders */
+td.border-email-start { border-left: 2px solid rgba(91,163,255,0.3); }
+td.border-web-start   { border-left: 2px solid rgba(0,217,200,0.3); }
+td.border-file-start  { border-left: 2px solid rgba(93,232,90,0.3); }
+td.border-alt-start   { border-left: 2px solid rgba(255,170,85,0.3); }
+
+/* ── Footer Note ── */
+.table-notes {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.note-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+.note-card-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.note-card ul {
+  list-style: none;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.note-card ul li {
+  font-size: 11.5px;
+  color: #5a7a90;
+  padding-left: 12px;
+  position: relative;
+  line-height: 1.5;
+}
+.note-card ul li::before {
+  content: '›';
+  position: absolute; left: 0;
+  color: var(--muted);
+}
+.note-card ul li strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.footer-bar {
+  margin-top: 36px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--muted);
+}
+
+@media (max-width: 800px) {
+  .table-notes { grid-template-columns: 1fr; }
+  .legend { gap: 16px; }
+}
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- ── Header ── -->
+<div class="page-header">
+  <div class="tag-line">BTL1 · Report Writing Reference · SOC Tier 1</div>
+  <h1>Phishing Artifact Collection <em>Reference Table</em></h1>
+  <p>Maps every collectable artifact against each phishing attack type. Use during report writing to confirm all relevant IOCs have been gathered and documented. Cells show collection requirement status and the recommended tool.</p>
+</div>
+
+<!-- ── Legend ── -->
+<div class="legend">
+  <div class="legend-section">
+    <div class="legend-title">Symbol Key</div>
+    <div class="legend-items">
+      <div class="legend-item"><span class="sym sym-req">✦</span> <span>Required — Always collect for this attack type</span></div>
+      <div class="legend-item"><span class="sym sym-cond">◎</span> <span>Conditional — Collect if present in this email</span></div>
+      <div class="legend-item"><span class="sym sym-na">—</span> <span>Not Applicable — Artifact does not exist for this type</span></div>
+    </div>
+  </div>
+  <div class="legend-section">
+    <div class="legend-title">Attack Group Colour Key</div>
+    <div class="legend-items">
+      <div class="legend-item"><span class="colgroup-dot" style="background:rgba(91,163,255,0.5)"></span> Email-Based</div>
+      <div class="legend-item"><span class="colgroup-dot" style="background:rgba(0,217,200,0.5)"></span> Web-Based</div>
+      <div class="legend-item"><span class="colgroup-dot" style="background:rgba(93,232,90,0.5)"></span> File-Based</div>
+      <div class="legend-item"><span class="colgroup-dot" style="background:rgba(255,170,85,0.5)"></span> Alt. Channels</div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Table ── -->
+<div class="table-scroll">
+<table>
+<colgroup>
+  <col class="c-rowgroup">
+  <col class="c-artifact">
+  <!-- EMAIL-BASED -->
+  <col class="c-spam">
+  <col class="c-bec">
+  <col class="c-spear">
+  <!-- WEB-BASED -->
+  <col class="c-cred">
+  <col class="c-urlshort">
+  <col class="c-maldom">
+  <col class="c-comprom">
+  <!-- FILE-BASED -->
+  <col class="c-attach">
+  <col class="c-macro">
+  <!-- ALT CHANNELS -->
+  <col class="c-vishing">
+  <col class="c-smishing">
+</colgroup>
+
+<thead>
+  <!-- Super-header row: attack type groups -->
+  <tr class="super-header">
+    <th class="sh-blank sticky" colspan="2"></th>
+    <th class="sh-email" colspan="3"><span class="sh-label">EMAIL-BASED</span></th>
+    <th class="sh-web"   colspan="4"><span class="sh-label">WEB-BASED</span></th>
+    <th class="sh-file"  colspan="2"><span class="sh-label">FILE-BASED</span></th>
+    <th class="sh-alt"   colspan="2"><span class="sh-label">ALT. CHANNELS</span></th>
+  </tr>
+
+  <!-- Sub-header row: individual attack types -->
+  <tr class="col-header">
+    <th class="ch-row-group sticky">ARTIFACT GROUP</th>
+    <th class="ch-row-artifact sticky-2nd">ARTIFACT / IOC</th>
+    <!-- EMAIL -->
+    <th class="ch-email border-email-start">SPAM<br>EMAIL</th>
+    <th class="ch-email">BEC<br><span style="font-size:8px;color:#4a80aa">Business Email<br>Compromise</span></th>
+    <th class="ch-email">SPEAR<br>PHISHING</th>
+    <!-- WEB -->
+    <th class="ch-web border-web-start">CREDENTIAL<br>HARVESTER</th>
+    <th class="ch-web">URL<br>SHORTENING</th>
+    <th class="ch-web">MALICIOUS<br>DOMAIN</th>
+    <th class="ch-web">COMPROMISED<br>DOMAIN</th>
+    <!-- FILE -->
+    <th class="ch-file border-file-start">MALICIOUS<br>ATTACHMENT</th>
+    <th class="ch-file">OFFICE<br>MACROS</th>
+    <!-- ALT -->
+    <th class="ch-alt border-alt-start">VISHING<br><span style="font-size:8px;color:#805020">Voice Call</span></th>
+    <th class="ch-alt">SMISHING<br><span style="font-size:8px;color:#805020">SMS / Text</span></th>
+  </tr>
+</thead>
+
+<tbody>
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  ROW GROUP 1: EMAIL ARTIFACTS                                  -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- Sending Address -->
+<tr class="r-email row-group-start">
+  <td class="artifact-label sticky row-group-cell rgc-email" rowspan="11">EMAIL<br>ARTIFACTS</td>
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Sending Address</span>
+    <span class="art-desc">Full From: field (mailbox@domain)</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor / Email Client</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor (check display name vs actual)</span></div><div class="cell-note note-key">KEY: display name spoofed?</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor / Email Client</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Sender Domain -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Sender Domain</span>
+    <span class="art-desc">@domain portion; check legitimacy</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div><div class="cell-note note-warn">Often spoofed legitimate domain</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div><div class="cell-note note-warn">Domain IS the malicious one</div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor — may be legit</span></div><div class="cell-note note-warn">Domain looks legit! Check path</div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Reply-To -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Reply-To Address</span>
+    <span class="art-desc">If different from From: — major indicator</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor (header)</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor (header)</span></div><div class="cell-note note-key">KEY BEC indicator — replies go to attacker</div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor (header)</span></div></td>
+  <td class="cell border-web-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Sending Server IP -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Sending Server IP</span>
+    <span class="art-desc">X-Sender-IP / X-Originating-IP header</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor (X-Sender-IP)</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor (header)</span></div><div class="cell-note note-warn">Reveals true origin vs spoofed address</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Reverse DNS -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Reverse DNS</span>
+    <span class="art-desc">Hostname of sending server IP (PTR record)</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">whois.domaintools.com / MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">whois.domaintools.com</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">whois.domaintools.com</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">whois.domaintools.com</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- SPF -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">SPF Result</span>
+    <span class="art-desc">Sender Policy Framework — did IP pass?</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox / Email Header Analyzer</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div><div class="cell-note note-key">FAIL = IP not authorized to send for domain</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">MXToolbox</span></div><div class="cell-note note-warn">May PASS — legit domain is compromised</div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- DKIM -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">DKIM Result</span>
+    <span class="art-desc">DomainKeys Identified Mail — signature valid?</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox / Email Header</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div><div class="cell-note note-key">FAIL = email body tampered / not signed by claimed domain</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">MXToolbox</span></div><div class="cell-note note-warn">May PASS if attacker controls the domain</div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">MXToolbox</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- DMARC -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">DMARC Result</span>
+    <span class="art-desc">Policy outcome: none / quarantine / reject</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header / MXToolbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header</span></div><div class="cell-note note-warn">FAIL indicates spoofed domain</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Email Header</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Header</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Subject Line -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Subject Line</span>
+    <span class="art-desc">Full subject; used for gateway rule blocking</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client / Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Date / Time -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Date &amp; Time</span>
+    <span class="art-desc">Sent / received timestamp from header Date: field</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor (Date: header)</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-alt-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Call Log / Victim Statement</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">SMS Log / Screenshot</span></div></td>
+</tr>
+
+<!-- Message-ID -->
+<tr class="r-email">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Message-ID</span>
+    <span class="art-desc">Unique email identifier for tracking / gateway correlation</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor (Message-ID: header)</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div><div class="cell-note note-key">Used to find all recipients on gateway</div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div><div class="cell-note note-key">Used to identify all recipients</div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  ROW GROUP 2: WEB ARTIFACTS                                    -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- URL / Hyperlink -->
+<tr class="r-web row-group-start">
+  <td class="artifact-label sticky row-group-cell rgc-web" rowspan="8">WEB<br>ARTIFACTS</td>
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">URL / Hyperlink</span>
+    <span class="art-desc">Full URL from body; use anchor &lt;a&gt; tags in source</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor (HTML source)</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor / HTML anchor tags</span></div><div class="cell-note note-key">PRIMARY artifact for this type</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div><div class="cell-note">May link to C2/download</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div><div class="cell-note">C2 callback URL in macro code</div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">SMS Screenshot</span></div></td>
+</tr>
+
+<!-- Shortened URL -->
+<tr class="r-web">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Shortened URL</span>
+    <span class="art-desc">Original bit.ly / short URL before expansion</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-web-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Text Editor</span></div><div class="cell-note note-key">Record ORIGINAL short URL as IOC</div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Text Editor</span></div></td>
+  <td class="cell border-file-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">SMS Screenshot</span></div></td>
+</tr>
+
+<!-- Expanded / Redirect URL -->
+<tr class="r-web">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Expanded / Redirect URL</span>
+    <span class="art-desc">True destination after resolving redirects</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">WannaBrowser — append "+" to bitly</span></div><div class="cell-note note-key">Expands short URL without clicking it</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">WannaBrowser</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">WannaBrowser</span></div></td>
+</tr>
+
+<!-- Domain WHOIS -->
+<tr class="r-web">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Domain WHOIS</span>
+    <span class="art-desc">Registrant, registrar, creation date, expiry</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">whois.domaintools.com</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools / PhishTool WHOIS</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div><div class="cell-note note-key">Recently registered? Privacy-protected? Red flags!</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">domaintools</span></div><div class="cell-note">Confirms legitimate org owns domain</div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">domaintools</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">domaintools (C2 domain)</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">domaintools</span></div></td>
+</tr>
+
+<!-- Hosting IP Address -->
+<tr class="r-web">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Hosting IP Address</span>
+    <span class="art-desc">IP of the web server / domain (for web proxy block)</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">URLScan / nslookup</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">URLScan</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">URLScan</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URLScan.io / IPVoid</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URLScan / IPVoid</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URLScan / IPVoid</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URLScan</span></div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">URLScan</span></div></td>
+</tr>
+
+<!-- URL Reputation -->
+<tr class="r-web">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">URL Reputation Score</span>
+    <span class="art-desc">Community-flagged malicious? Vendor detections?</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal / URLScan</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">VirusTotal / URLScan / PhishTank / URLhaus</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">VirusTotal</span></div><div class="cell-note note-warn">Expanded URL only — never submit short URL</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">VirusTotal / PhishTank / URLhaus</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal</span></div><div class="cell-note note-warn">May be CLEAN — domain recently compromised</div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">VirusTotal (C2 domain)</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal</span></div></td>
+</tr>
+
+<!-- IP Reputation -->
+<tr class="r-web">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">IP Reputation</span>
+    <span class="art-desc">Blacklist / threat intelligence score for sending/hosting IP</span>
+  </td>
+  <td class="cell border-email-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">IPVoid / VirusTotal</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">IPVoid</span></div><div class="cell-note note-warn">May appear CLEAN — legit hosting provider</div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">IPVoid</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">IPVoid</span></div></td>
+</tr>
+
+<!-- Screenshot of Site -->
+<tr class="r-web">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Site Screenshot</span>
+    <span class="art-desc">Visual of destination page — include in report</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-web-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URL2PNG / URLScan / PhishTool</span></div><div class="cell-note note-key">Evidence of fake login page</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URL2PNG (expanded URL)</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URL2PNG / URLScan</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">URL2PNG / URLScan</span></div></td>
+  <td class="cell border-file-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">URL2PNG (if URL present)</span></div></td>
+</tr>
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  ROW GROUP 3: FILE ARTIFACTS                                   -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- Filename + Extension -->
+<tr class="r-file row-group-start">
+  <td class="artifact-label sticky row-group-cell rgc-file" rowspan="6">FILE<br>ARTIFACTS</td>
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Filename + Extension</span>
+    <span class="art-desc">Full filename; watch for double extensions (.pdf.exe)</span>
+  </td>
+  <td class="cell border-email-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Email Client / Text Editor ("filename=" in source)</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Email Client</span></div><div class="cell-note">Lure docs (invoices, HR forms)</div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Email Client</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client / Text Editor</span></div><div class="cell-note note-warn">Check for double extension!</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Email Client</span></div><div class="cell-note">.doc/.docm/.xls/.xlsm</div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- MD5 Hash -->
+<tr class="r-file">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">MD5 Hash</span>
+    <span class="art-desc">Fast hash for reputation checks; not collision-resistant</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">PowerShell: Get-FileHash -Algorithm MD5</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">PowerShell / md5sum</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">PowerShell: Get-FileHash -Algorithm MD5</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">PowerShell / md5sum</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- SHA256 Hash -->
+<tr class="r-file">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">SHA256 Hash</span>
+    <span class="art-desc">Preferred hash for file blocking and threat intel sharing</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">PowerShell: Get-FileHash (default)</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">PowerShell / sha256sum</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">PowerShell: Get-FileHash / sha256sum (Linux)</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">PowerShell / sha256sum</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- File Reputation -->
+<tr class="r-file">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">File Reputation</span>
+    <span class="art-desc">Community / vendor detection score (via hash or upload)</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal / Talos File Reputation</span></div></td>
+  <td class="cell s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">VirusTotal</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">VirusTotal (upload) / Talos (SHA256)</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">VirusTotal / Talos</span></div><div class="cell-note note-warn">Low score ≠ safe — submit for sandbox too</div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Macro Presence -->
+<tr class="r-file">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Macro Presence</span>
+    <span class="art-desc">Embedded VBA macro in Office doc; requires Enable Content click</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-cond"><div class="cell-inner"><span class="cell-sym">◎</span><span class="cell-tool">Manual inspection in VM</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Open in VM — check for Enable Content prompt</span></div><div class="cell-note note-key">PRIMARY indicator for this type</div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- Sandbox Report -->
+<tr class="r-file">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Sandbox Report</span>
+    <span class="art-desc">Detonation behavior: network calls, file writes, C2 comms</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Hybrid Analysis / Enterprise Sandbox</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Hybrid Analysis — detonate in Windows VM</span></div><div class="cell-note note-key">Reveals C2 URL, dropped files, process tree</div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!--  ROW GROUP 4: ALT CHANNEL ARTIFACTS                           -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+
+<!-- Caller / Sender Phone Number -->
+<tr class="r-alt row-group-start">
+  <td class="artifact-label sticky row-group-cell rgc-alt" rowspan="4">ALT<br>CHANNEL<br>ARTIFACTS</td>
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Phone Number</span>
+    <span class="art-desc">Caller ID or SMS originating number (may be spoofed)</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-alt-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Victim call log / OSINT lookup</span></div><div class="cell-note note-warn">Caller ID likely spoofed</div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Victim device screenshot</span></div><div class="cell-note note-warn">Sender may use masked number</div></td>
+</tr>
+
+<!-- Call Notes / Recording -->
+<tr class="r-alt">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">Call Notes / Recording</span>
+    <span class="art-desc">Script used, info requested, pretext scenario described</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-alt-start s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Victim interview notes</span></div><div class="cell-note note-key">Document urgency tactics, impersonation used</div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+</tr>
+
+<!-- SMS Sender Number -->
+<tr class="r-alt">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">SMS Sender ID / Number</span>
+    <span class="art-desc">Originating number or alphanumeric sender ID</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Victim device screenshot</span></div></td>
+</tr>
+
+<!-- SMS Content -->
+<tr class="r-alt">
+  <td class="artifact-label sticky-2nd">
+    <span class="art-name">SMS Message Content</span>
+    <span class="art-desc">Full text body; urgency language; any embedded URLs</span>
+  </td>
+  <td class="cell border-email-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-web-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-file-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell border-alt-start s-na"><div class="cell-inner"><span class="cell-sym">—</span></div></td>
+  <td class="cell s-req"><div class="cell-inner"><span class="cell-sym">✦</span><span class="cell-tool">Victim device screenshot / forward to email</span></div><div class="cell-note note-key">Transcribe verbatim; then analyze any URLs</div></td>
+</tr>
+
+</tbody>
+</table>
+</div><!-- /table-scroll -->
+
+
+<!-- ── Notes Section ── -->
+<div class="table-notes">
+
+  <div class="note-card">
+    <div class="note-card-title">⚡ Critical Analyst Notes</div>
+    <ul>
+      <li><strong>Not flagged ≠ safe.</strong> VirusTotal clean does not mean benign — new/targeted attacks are unknown to vendors. Assume suspicious.</li>
+      <li><strong>Compromised domains pass SPF/DKIM.</strong> A legitimate domain's authentication can pass even if attacker controls the sending mailbox.</li>
+      <li><strong>BEC critical artifact is Reply-To.</strong> The From address looks legitimate; the attacker's address hides in Reply-To.</li>
+      <li><strong>Always analyze in a VM.</strong> Never open attachments or click links on a production system.</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <div class="note-card-title">📝 Report Writing: Defang All IOCs</div>
+    <ul>
+      <li>IP addresses: <strong>8.8.8.8 → 8[.]8[.]8[.]8</strong></li>
+      <li>URLs: <strong>https://evil.com → hxxps://evil[.]com</strong></li>
+      <li>Use <strong>CyberChef → Defang IP / Defang URL</strong> for batch processing</li>
+      <li>Every block action must log: <strong>Block Type · Value · Date/Time · Analyst Name</strong></li>
+      <li>Always document your justification and assess negative business impact before blocking.</li>
+    </ul>
+  </div>
+
+  <div class="note-card">
+    <div class="note-card-title">🛡 Blocking Decision Reference</div>
+    <ul>
+      <li><strong>Sender Address</strong> → Email Gateway block (if uniquely malicious)</li>
+      <li><strong>Sender Domain</strong> → Email Gateway (only if entirely malicious)</li>
+      <li><strong>Sending Server IP</strong> → Email Gateway (avoid if shared/legit provider)</li>
+      <li><strong>Subject Line</strong> → Email Gateway (if highly specific &amp; unlikely to match legit mail)</li>
+      <li><strong>Malicious URL / Domain</strong> → Web Proxy block</li>
+      <li><strong>File Hash</strong> → AV / EDR / Endpoint block</li>
+    </ul>
+  </div>
+
+</div><!-- /table-notes -->
+
+<div class="footer-bar">
+  <span>BTL1 · PHISHING ANALYSIS DOMAIN</span>
+  <span>ARTIFACT COLLECTION REFERENCE TABLE v1.0</span>
+  <span>SOC TIER 1 · REPORT WRITING AID</span>
+</div>
+
+</div><!-- /wrapper -->
+</body>
+</html>
