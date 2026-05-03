@@ -133,9 +133,9 @@ All content in this repository is for **educational and portfolio purposes only*
 
 If you're a recruiter, hiring manager, or fellow analyst and want to connect:
 
-🔗 **[LinkedIn](https://linkedin.com/in/yourprofile)**
-💼 **[Portfolio / Personal Site](https://yoursite.com)** *(if applicable)*
+🔗 **[LinkedIn](https://linkedin.com/in/kazu-suryadikarta-81524a189)**
+💼 **[Portfolio Main Page](https://github.com/Kazu010101/Kazu010101/edit/main/README.md)** 
 
 ---
 
-*Last updated: [Month Year]*
+*Last updated: [03/05/2026]*
