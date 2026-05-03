@@ -6,7 +6,7 @@
 
 ## About This Repo
 
-This repository documents my approach to phishing analysis, including the tools, processes, and reasoning I apply when triaging suspicious emails.
+This repository documents my approach to phishing analysis, including the tools, processes, and reasoning I apply when triaging suspicious emails and deciding defensive measures.
 
 I'm currently working toward upskilling myself to land a job as **SOC Analyst Tier 1** and am building hands-on skills in threat detection and incident response.
 
