@@ -114,11 +114,11 @@ Real-world style phishing investigations documented in analyst report format. Ea
 
 ## Skills Demonstrated
 
-- Email header analysis (SPF / DKIM / DMARC interpretation)
+- Email header analysis 
 - IOC extraction and artifact triage across email, web, and file types
 - Threat intelligence tool usage (VirusTotal, URLScan, Hybrid Analysis)
 - Phishing attack type classification (BEC, credential harvesting, macro delivery, smishing, vishing)
-- Defensive response documentation (gateway blocks, proxy rules, endpoint controls)
+- Defensive measures documentation (gateway blocks, proxy rules, endpoint controls)
 - Analyst report writing with defanged IOCs and audit-trail logging
 
 ---
